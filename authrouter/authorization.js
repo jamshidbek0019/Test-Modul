@@ -10,7 +10,7 @@ const bcrypt = require('bcrypt')
 router.use(express.json())
 router.use(express.urlencoded({ extended: false }))
 
-router.post('', async (req, res)=>{  
+router.get('', async (req, res)=>{  
      
     let body = req.body
 
@@ -30,7 +30,7 @@ router.post('', async (req, res)=>{
     }   
         let token =  user.generateAuthToken()
         res.header('role', user.role)
-        res.header('x-user-token', token).send(user.role).status(200)
+        res.header('x-user-token', token).send(user).status(200)
         return
         
     }
@@ -43,7 +43,7 @@ router.post('', async (req, res)=>{
     }   
         let token =  teacher.generateAuthToken()
         res.header('role', teacher.role)
-        res.header('x-user-token', token).send(teacher.role).status(200)
+        res.header('x-user-token', token).send(teacher).status(200)
         return
         
     }

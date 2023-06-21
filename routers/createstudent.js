@@ -13,7 +13,7 @@ router.use(express.urlencoded({ extended: false }))
  
 
 
-router.post('',teacher_auth,  async (req, res)=>{  
+router.post('',  async (req, res)=>{  
     let salt  = await bcrypt.genSalt(12)
     let student = req.body 
     student.password =  await bcrypt.hash(student.password, salt)
@@ -36,7 +36,7 @@ router.post('',teacher_auth,  async (req, res)=>{
         res.send("sucsesfully created").status(201)
 
 })
-router.get('',teacher_auth,  async (req,res)=>{
+router.get('',  async (req,res)=>{
     let students = await studentModul.find()
     res.send(students)
 })
