@@ -4,6 +4,7 @@ module.exports = function admin_auth(req, res, next){
     let token = req.header('x-user-token')
     if (!token){
         res.status(401).send("Unautorization token")
+        return
     }
    
     try{ 

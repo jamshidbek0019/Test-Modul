@@ -10,13 +10,13 @@ const bcrypt = require('bcrypt')
 router.use(express.json())
 router.use(express.urlencoded({ extended: false }))
 
-router.get('', async (req, res)=>{  
+router.post('', async (req, res)=>{  
      
     let body = req.body
 
     let {err} = validate(body)
     if(err){
-        res.send({error: result.error.details[0].message}).status(400)
+        res.status(400).send({error: result.error.details[0].message})
         return 
     }
     let user = await studentModul.findOne({login: body.login})
@@ -25,12 +25,13 @@ router.get('', async (req, res)=>{
         let TrueUser = await bcrypt.compare(body.password, user.password)
 
         if(!TrueUser){
-            res.send('Login yoki parolni xato kiritdingiz 2.').status(400)
+            res.status(400).send('Login yoki parolni xato kiritdingiz 2.')
             return
     }   
         let token =  user.generateAuthToken()
+
         res.header('role', user.role)
-        res.header('x-user-token', token).send(user).status(200)
+        res.header('x-user-token', token).status(200).send(user)
         return
         
     }
@@ -38,18 +39,18 @@ router.get('', async (req, res)=>{
         let TrueUser = await bcrypt.compare(body.password, teacher.password)
 
         if(!TrueUser){
-            res.send('Login yoki parolni xato kiritdingiz 2.').status(400)
+            res.status(400).send('Login yoki parolni xato kiritdingiz 2.')
             return
     }   
         let token =  teacher.generateAuthToken()
         res.header('role', teacher.role)
-        res.header('x-user-token', token).send(teacher).status(200)
+        res.header('x-user-token', token).status(200).send(teacher)
         return
         
     }
 
    
-    res.send(`Login yoki parolni xato kiritdingiz 1.`).status(400)
+    res.status(400).send(`Login yoki parolni xato kiritdingiz 1.`)
         return
 })
 

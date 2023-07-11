@@ -6,10 +6,11 @@ let resultSchema = new mongoose.Schema({
    [ {
        question:String,
        keys: String,
-       trueKeys: String,
+       trueKey: String,
        correct: Boolean 
     }
 ],
+theme:String,
 
 takenTime: String,
 

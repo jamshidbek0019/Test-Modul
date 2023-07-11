@@ -1,6 +1,7 @@
 const express = require('express')
 const student_auth = require('../middeware/student')
 const router = express.Router()
+const {subjectModul} = require('../models/subject')
 
 const {resultModul} = require('../models/results')
 
@@ -10,30 +11,27 @@ router.use(express.json())
 router.use(express.urlencoded({ extended: false }))
 
 let startTime, finishTime
+ 
 
-
-router.get('/api/take-test/:id', student_auth, async (req, res) => {
+router.get('/api/take-test/:id',  async (req, res) => {
     startTime = new Date()
 
     let id = parseInt(req.params.id)
     let testmodul = TestModul(id)
 
-    let tests = await testmodul.find()
-        .select({ question: 1, keys: 1, _id: 0 })
-    tests.sort(() => {
+    let data = await testmodul.find()
+        .select({ question: 1, keys: 1, _id:1    })
+    data.sort(() => {
         return Math.random() - 0.5;
     })
-    tests.forEach(el => el.keys.sort(() => {
+    data.forEach(el => el.keys.sort(() => {
         return Math.random() - 0.5;
     }))
-
-    let obj = {
-        test: tests,
-        role: req.user.role,
-        name: req.user.name
+    let dataSend= {
+        data
     }
 
-    res.send(obj);
+    res.send(dataSend);
 })
 
 router.post('/api/finish-test/:id', student_auth, async (req, res) => {
@@ -41,13 +39,14 @@ router.post('/api/finish-test/:id', student_auth, async (req, res) => {
 
     let answers = req.body
     let id = parseInt(req.params.id)
+    let themeData = await subjectModul.find({id: id})
     let testmodul = TestModul(id)
 
     let results = [
         {
             question: "",
             keys: "",
-            trueKeys: "",
+            trueKey: "",
             correct: true
         }]
 
@@ -61,7 +60,7 @@ router.post('/api/finish-test/:id', student_auth, async (req, res) => {
         results[i] = {
             question: answers[i].question,
             keys: answer,
-            trueKey: tests_new[0].question
+            trueKeys: tests_new[0].question
         }
 
         if (tests_new[0].trueKey == answer) {
@@ -91,6 +90,7 @@ router.post('/api/finish-test/:id', student_auth, async (req, res) => {
     let time = `${parseInt(timeM)}:${parseInt(timeS % 60)}`
     let obj = {
         answer: results,
+        theme: themeData[0].theme,
 
         takenTime: time,
 
@@ -101,9 +101,22 @@ router.post('/api/finish-test/:id', student_auth, async (req, res) => {
         prosent: parseFloat(k) / answers.length * 100
     }
 
-    let new_obj = await resultModul.create(obj)
-    res.send(new_obj) 
+    let data = await resultModul.create(obj)
+    res.send({
+        takenTime: obj.takenTime,
+        TrueAnswers:obj.TrueAnswers, 
+        prosent:obj.prosent}) 
      
     
+})
+router.get('/api/result', async (req, res)=>{
+    let data = await resultModul.find()
+    .select({
+        answer:0
+    })
+    let dataSend = {
+        data
+    }
+    res.send(dataSend) 
 })
 module.exports = router

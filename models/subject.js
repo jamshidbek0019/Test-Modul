@@ -11,7 +11,13 @@ let subjectSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    creat_at: Date
+    information:{
+        type:String,
+        required:true
+    },
+    link:{
+        type:String,
+    },
 })
 
 let  subjectModul = mongoose.model(`subjects`, subjectSchema)
@@ -20,7 +26,8 @@ function validate(val){
     let subjectSchemaJoi = Joi.object({
         theme: Joi.string().required().min(8),
         id:Joi.number().integer(),
-        creat_at:Joi.date()
+        information:Joi.string(),
+        link:Joi.string(),
     })
     return  subjectSchemaJoi.validate(val);
     }

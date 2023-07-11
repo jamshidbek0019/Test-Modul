@@ -9,7 +9,7 @@ router.use(express.json())
 router.use(express.urlencoded({ extended: false }))
     
 
-router.post('/:id',teacher_auth, async (req, res) =>{
+router.post('/:id', async (req, res) =>{
 
     let test = req.body;
     let id = parseInt(req.params.id)
@@ -28,33 +28,36 @@ router.post('/:id',teacher_auth, async (req, res) =>{
 
 })
 
-router.get ('/:id', teacher_auth, async (req, res )=>{
+router.get ('/:id',  async (req, res )=>{
     id = parseInt(req.params.id)
     
     let testmodul = TestModul(id)
-    let tests = await testmodul.find().select({question:1, keys:1, _id:0})
-    res.send(tests)
+    let data = await testmodul.find().select({question:1, keys:1, _id:0})
+    let dataSend = {
+        data
+    }
+    res.send(dataSend)
 })
 
-router.put('/:id/',teacher_auth, async (req, res)=>{
-    let body =  req.body
-    id = parseInt(req.params.id);
+router.put('/:id', async (req, res)=>{
+    let new_test = req.body;
+    let id = parseInt(req.params.id)
+    new_test.id= id
+    new_test.trueKey = new_test.keys[0];
     let testmodul = TestModul(id)
-    let upTest = await testmodul.findOneAndUpdate(_id, 
-        {
-            question: body.question,
-            keys: body.keys,
-            trueKey: body.keys[0],
-
-        });
-        res.send(upTest);
+   try{
+    await testmodul.findOneAndUpdate({question: new_test.question},new_test)
+   } catch(err){
+        res.status().send(err)
+        return
+   }
+        res.send("successfully updated");
 })
-router.delete('/:id',teacher_auth, async (req, res)=>{
+router.delete('/:id', async (req, res)=>{
     let body =  req.body
     id= parseInt(req.params.id);
-    let testmodul = TestModul(id)    
-    
-    let deltest = await testmodul.findOneAndDelete({question: body.question})
+    let testmodul = TestModul(id)       
+     await testmodul.findOneAndDelete({question: body.question})
 
      res.send("test has successfully deleted")
     

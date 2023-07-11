@@ -6,7 +6,7 @@ const admin_auth = require('../middeware/admin')
 
 const bcrypt = require('bcrypt')
 
-
+router.use(admin_auth)
 const _ = require('lodash')
 
 router.use(express.json())
@@ -14,7 +14,7 @@ router.use(express.urlencoded({ extended: false }))
  
 
 
-router.post('', admin_auth, async (req, res)=>{  
+router.post('',  async (req, res)=>{  
     let salt  = await bcrypt.genSalt(12)
     let teacher  = req.body 
     teacher.password =  await bcrypt.hash(teacher.password, salt)
@@ -36,11 +36,11 @@ router.post('', admin_auth, async (req, res)=>{
     
 
 })
-router.get('',admin_auth, async (req,res)=>{
+router.get('', async (req,res)=>{
     let teachers = await teacherModul.find()
     res.send(teachers)
 })
-router.delete('', admin_auth, async (req, res)=> {
+router.delete('',  async (req, res)=> {
     let name = req.body.ful_name;
     await teacherModul.findOneAndDelete({full_name: name})
     res.status(204).send('successfully deleted')
